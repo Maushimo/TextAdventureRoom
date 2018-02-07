@@ -28,7 +28,7 @@ public class Interaction : MonoBehaviour {
            Debug.DrawRay(transform.position, transform.forward);
 
            //check raycast collisions with interactable objects
-           if(Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out Hit, 20.0f, InteractableLayerMask))
+           if(Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out Hit, 3.0f, InteractableLayerMask))
            {
            	Debug.DrawRay(transform.position, transform.TransformDirection (Vector3.forward) * Hit.distance, Color.red);
            	//Debug.Log("Did hit computer");
@@ -43,7 +43,7 @@ public class Interaction : MonoBehaviour {
            				ComputerState = !ComputerState;
            			}
            			//...if not then pick up the object
-           			else
+           			else if(Hit.collider.tag == "Pickupable Object")
            			{
            				CarryingObject = !CarryingObject;
            				//Debug.Log("PICKUP " + Hit.collider.gameObject.name);
@@ -61,11 +61,22 @@ public class Interaction : MonoBehaviour {
            {
            	PickupObject(Hit.collider.gameObject);
            }
+           else if(!CarryingObject)
+           {
+           	PutDownObject(Hit.collider.gameObject);
+           }
 	}
 
 	void PickupObject(GameObject Object)
 	{
 		Object.GetComponent<Rigidbody>().isKinematic = true;
-		Object.transform.position = Vector3.Lerp(Object.transform.position, transform.position, 0.5f);
+		Object.transform.parent = transform;
+		//Object.transform.position = Vector3.Lerp(Object.transform.position, transform.position, 0.5f);
+	}
+
+	void PutDownObject(GameObject Object)
+	{
+		Object.GetComponent<Rigidbody>().isKinematic = false;
+		Object.transform.parent = null;
 	}
 }
